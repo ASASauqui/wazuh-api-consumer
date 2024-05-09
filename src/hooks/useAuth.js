@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { useLocalStorage } from "./useLocalStorage";
 
-import { login } from '../services/authentication';
+import { login, logout } from '../services/authentication';
 
 const AuthContext = createContext();
 
@@ -16,7 +16,14 @@ export const AuthProvider = ({ children }) => {
         const loginResponse = await login(values);
         const loginData = await loginResponse.json();
 
-        console.log(loginData);
+        if (loginResponse.ok) {
+            toast.success('Se ha iniciado sesión correctamente');
+            setUser({ token: loginData.data.token });
+            navigate("/");
+        }
+        else {
+            toast.error('Error al iniciar sesión');
+        }
     };
 
     const updateUser = async () => {
@@ -24,8 +31,14 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Call this function to sign out logged in user
-    const logout = () => {
-        console.log('logout');
+    const logoutUser = async () => {
+        setUser(null);
+        toast.success('Se ha cerrado sesión correctamente');
+
+        const logoutResponse = await logout(user.token);
+        const logoutData = await logoutResponse.json();
+
+        navigate("/login", { replace: true });
     };
 
     const value = useMemo(
@@ -33,7 +46,7 @@ export const AuthProvider = ({ children }) => {
             user,
             loginUser,
             updateUser,
-            logout,
+            logoutUser,
         }),
         [user]
     );
