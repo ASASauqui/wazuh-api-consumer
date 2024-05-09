@@ -1,6 +1,6 @@
 import './index.css';
 
-function CustomInput({ label, type, id, name, value, onChange, onBlur, touched, errors, placeholder, autoComplete }) {
+function CustomInput({ label, type, id, name, value, onChange, onBlur, touched, errors, placeholder, autoComplete, required = false }) {
     return (
         <div className="relative">
             <label htmlFor={id}>{label}</label>
@@ -14,8 +14,8 @@ function CustomInput({ label, type, id, name, value, onChange, onBlur, touched, 
                 onBlur={onBlur}
                 placeholder={placeholder}
                 className={"p-2 peer bg-white placeholder-transparent h-10 w-full border-2 text-gray-900 focus:outline-none rounded-md"
-                + (touched[name] && errors[name] ? " border-rose-600 bg-rose-100" : "") + (touched[name] && !errors[name] ? " border-green-600 bg-green-100" : " ")}
-                required />
+                    + (touched[name] && errors[name] ? " border-rose-600 bg-rose-100" : "") + (touched[name] && !errors[name] ? " border-green-600 bg-green-100" : " ")}
+                required={required} />
             {touched[name] && !errors[name] ? (
                 <div></div>
             ) : null}
