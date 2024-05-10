@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
+import Agent from "./pages/Agent";
 
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AlreadyAuthenticatedRoute } from "./components/AlreadyAuthenticatedRoute";
@@ -29,6 +30,11 @@ function App() {
                 <Home />
               </ProtectedRoute>
             } />
+            <Route path="/agent/:id" element={
+              <>
+                <Navbar />
+                <Agent />
+              </>} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>

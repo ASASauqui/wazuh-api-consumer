@@ -1,5 +1,6 @@
 import './index.css';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from "../../hooks/useAuth";
 import { listAgents, deleteAgent } from '../../services/agents';
@@ -7,6 +8,7 @@ import RippleButton from '../../components/Buttons/RippleButton';
 import AgentModal from '../../components/Modals/AgentModal';
 
 function Home() {
+    const navigate = useNavigate();
     const { user } = useAuth();
     const [agents, setAgents] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -50,6 +52,10 @@ function Home() {
         setLoading(false);
     }, []);
 
+    const handleAgentClick = (id) => {
+        navigate(`/agent/${id}`);
+    };
+
     const handleDeleteAgent = async (agent) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar este agente?')) {
             const response = await deleteAgent({ agents_list: [agent.id], status: 'all' }, user.token);
@@ -66,8 +72,8 @@ function Home() {
 
     return (
         <>
-            <div className='min-h-screen bg-slate-100 p-5'>
-                <div className="flex flex-col bg-white border border-gray-200 rounded-md p-5">
+            <div className='min-h-screen bg-slate-100 px-5 md:px-20 py-10'>
+                <div className="flex flex-col bg-white border border-gray-200 rounded-md px-5 py-10">
                     {/* Header */}
                     <div className='w-full'>
                         <div className="flex flex-col sm:flex-row justify-between">
@@ -144,7 +150,7 @@ function Home() {
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {/* Rows */}
                                     {agents.map((agent) => (
-                                        <tr key={agent.id} className='hover:bg-gray-100 cursor-pointer' onClick={() => { console.log(agent) }}>
+                                        <tr key={agent.id} className='hover:bg-gray-100 cursor-pointer' onClick={() => handleAgentClick(agent.id)}>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {agent.id}
                                             </td>
