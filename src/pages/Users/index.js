@@ -3,70 +3,53 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from "../../hooks/useAuth";
-import { listAgents, deleteAgent } from '../../services/agents';
+import { listUsers, deleteUsers } from '../../services/security';
 import RippleButton from '../../components/Buttons/RippleButton';
-import AgentModal from '../../components/Modals/AgentModal';
+import UserModal from '../../components/Modals/UserModal';
 
-function Home() {
+function Users() {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const [agents, setAgents] = useState([]);
+    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Agent Actions
-    const [agentAction, setAgentAction] = useState('add');
-    const [selectedAgent, setSelectedAgent] = useState({});
-    const [showAgentModal, setShowAgentModal] = useState(false);
+    // User Actions
+    const [userAction, setUserction] = useState('add');
+    const [selectedUser, setSelectedUser] = useState({});
+    const [showUserModal, setShowUserModal] = useState(false);
 
-    const fetchAgents = async () => {
-        const response = await listAgents(user.token);
+    const fetchUsers = async () => {
+        const response = await listUsers(user.token);
         const data = await response.json();
 
         if (!response.ok) {
             return;
         }
 
-        const filteredAgents = data.data.affected_items.map((agent) => {
-            var osName = "unknown";
-
-            if (agent.os !== undefined && agent.os.name !== undefined) {
-                osName = agent.os.name;
-            }
-
-            return ({
-                id: agent.id,
-                name: agent.name,
-                os: {
-                    name: osName
-                },
-                status: agent.status
-            })
-        });
-
-        setAgents(filteredAgents);
+        setUsers(data.data.affected_items);
     };
 
     useEffect(() => {
         setLoading(true);
-        fetchAgents();
+        fetchUsers();
         setLoading(false);
     }, []);
 
-    const handleAgentClick = (id) => {
-        navigate(`/agent/${id}`);
+    const handleUserClick = (id) => {
+        navigate(`/user/${id}`);
     };
 
-    const handleDeleteAgent = async (agent) => {
-        if (window.confirm('¿Estás seguro de que deseas eliminar este agente?')) {
-            const response = await deleteAgent({ agents_list: [agent.id], status: 'all' }, user.token);
+    const handleDeleteUser = async (userObject) => {
+        if (window.confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+            const response = await deleteUsers({ user_ids: [userObject.id] }, user.token);
             const data = await response.json();
 
             if (!response.ok) {
-                toast.error("Error al eliminar el agente");
+                toast.error("Error al eliminar el usuario");
                 return;
             }
 
-            toast.success("Agente eliminado correctamente");
+            toast.success("Usuario eliminado correctamente");
         }
     };
 
@@ -78,16 +61,16 @@ function Home() {
                     <div className='w-full'>
                         <div className="flex flex-col sm:flex-row justify-between">
                             {/* Title */}
-                            <h1 className="text-3xl font-bold text-gray-800">Todos los agentes</h1>
+                            <h1 className="text-3xl font-bold text-gray-800">Todos los usuarios</h1>
 
-                            {/* Add agent */}
+                            {/* Add user */}
                             <div className="flex justify-center items-center">
                                 <RippleButton
-                                    text="Add agent"
+                                    text="Add user"
                                     color="bg-primary"
                                     textColor="text-white"
                                     emoji="➕"
-                                    onClick={() => { setShowAgentModal(true) }}
+                                    onClick={() => { setShowUserModal(true) }}
 
                                 />
                             </div>
@@ -103,15 +86,15 @@ function Home() {
                         </div>
                     )}
 
-                    {/* No agents */}
-                    {!loading && agents.length === 0 && (
+                    {/* No users */}
+                    {!loading && users.length === 0 && (
                         <div className="flex justify-center items-center">
-                            <p className="text-gray-500">No se encontraron agentes</p>
+                            <p className="text-gray-500">No se encontraron usuarios</p>
                         </div>
                     )}
 
-                    {/* Agents */}
-                    {!loading && agents.length > 0 && (
+                    {/* Users */}
+                    {!loading && users.length > 0 && (
                         <div className='max-h-96 overflow-auto'>
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
@@ -126,19 +109,19 @@ function Home() {
                                             scope="col"
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Nombre de Agente
+                                            Nombre de Usuario
                                         </th>
                                         <th
                                             scope="col"
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Sistema Operativo
+                                            Permitir ejecutar como
                                         </th>
                                         <th
                                             scope="col"
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Estatus
+                                            Roles
                                         </th>
                                         <th
                                             scope="col"
@@ -147,49 +130,46 @@ function Home() {
                                         </th>
                                     </tr>
                                 </thead>
+
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {/* Rows */}
-                                    {agents.map((agent) => (
-                                        <tr key={agent.id} className='hover:bg-gray-100 cursor-pointer' onClick={() => handleAgentClick(agent.id)}>
+                                    {users.map((user) => (
+                                        <tr key={user.id} className='hover:bg-gray-100 cursor-pointer'>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                {agent.id}
+                                                {user.id}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                {agent.name}
+                                                {user.username}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                {agent.os.name}
+                                                {user.allow_run_as ? 'Sí' : 'No'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${agent.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                    {agent.status}
-                                                </span>
+                                                {user.roles.length}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex gap-2">
                                                 <button className="text-red-600 hover:text-red-900"
-                                                    onClick={(e) => { e.stopPropagation(); handleDeleteAgent(agent) }}>
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteUser(user) }}>
                                                     Borrar
                                                 </button>
-                                                {/* <button className="text-primary hover:text-primary-900"
-                                                    onClick={(e) => { e.stopPropagation(); console.log('Restart agent') }}>
-                                                    Restart
-                                                </button> */}
                                             </td>
+
                                         </tr>
                                     ))
                                     }
                                 </tbody>
+
                             </table>
                         </div>
                     )}
                 </div>
             </div>
-            {/* Agent Modal */}
-            {showAgentModal && (
-                <AgentModal action='add' agent={selectedAgent} setShowAgentModal={setShowAgentModal} />
+            {/* User Modal */}
+            {showUserModal && (
+                <UserModal action='add' user={selectedUser} setShowUserModal={setShowUserModal} />
             )}
         </>
     );
 }
 
-export default Home;
+export default Users;

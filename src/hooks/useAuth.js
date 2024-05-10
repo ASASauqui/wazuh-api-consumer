@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { useLocalStorage } from "./useLocalStorage";
 
-import { login, logout } from '../services/authentication';
+import { login, logout } from '../services/security';
 
 const AuthContext = createContext();
 
