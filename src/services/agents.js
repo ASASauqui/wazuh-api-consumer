@@ -27,4 +27,4 @@ export const deleteAgent = async (params, token) => {
             'Authorization': `Bearer ${token}`
         }
     });
-}
+};

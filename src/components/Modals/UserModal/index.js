@@ -6,39 +6,39 @@ import { toast } from 'react-toastify';
 
 import CustomInput from '../../CustomInput';
 import { useAuth } from '../../../hooks/useAuth';
-import { addAgent } from '../../../services/agents';
+import { addUser } from '../../../services/security';
 
-const AgentModal = ({ action, agent, setShowAgentModal }) => {
+const UserModal = ({ action, userObject, setShowUserModal }) => {
     const { user } = useAuth();
     const actionTitle = action === 'add' ? 'Add' : 'Edit';
 
     const { handleSubmit, handleChange, handleBlur, values, touched, errors, } = useFormik({
         initialValues: {
-            name: '',
-            ip: ''
+            username: '',
+            password: ''
         },
         validationSchema: Yup.object({
-            name: Yup.string().required('Requerido'),
-            ip: Yup.string().matches(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/, 'Dirección IP inválida')
+            username: Yup.string().required('Requerido'),
+            password: Yup.string().required('Requerido')
         }),
         onSubmit: async (values) => {
             if (action === 'add') {
-                const response = await addAgent(values, user.token);
+                const response = await addUser(values, user.token);
                 const data = await response.json();
 
                 if (!response.ok) {
-                    toast.error("Error al agregar el agente");
+                    toast.error("Error al agregar el usuario");
                     return;
                 }
 
-                setShowAgentModal(false);
-                toast.success("Agente agregado correctamente");
+                setShowUserModal(false);
+                toast.success("Usuario agregado correctamente");
             }
         }
     });
 
     const handleCloseModal = () => {
-        setShowAgentModal(false);
+        setShowUserModal(false);
     };
 
     return (
@@ -52,11 +52,11 @@ const AgentModal = ({ action, agent, setShowAgentModal }) => {
                             </svg>
                         </button>
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-800">{actionTitle} agent</h1>
+                    <h1 className="text-3xl font-bold text-gray-800">{actionTitle} user</h1>
                     <form onSubmit={handleSubmit} className='flex flex-col gap-10 bg-white mt-10'>
-                        <CustomInput label="Nombre" type="text" id="name" name="name" value={values.name} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} autoComplete="off" placeholder="Nombre" />
+                        <CustomInput label="Nombre de usuario" type="text" id="username" name="username" value={values.username} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} autoComplete="off" placeholder="Nombre de usuario" />
 
-                        <CustomInput label="IP" type="text" id="ip" name="ip" value={values.ip} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} autoComplete="off" placeholder="IP" />
+                        <CustomInput label="Contraseña" type="password" id="password" name="password" value={values.password} onChange={handleChange} onBlur={handleBlur} touched={touched} errors={errors} autoComplete="off" placeholder="Contraseña" />
 
                         <div className="mb-6">
                             <button type="submit" className="bg-primary relative mx-auto min-w-[150px] w-full h-[50px] flex justify-center bg-gradient-to-br items-center rounded-[5px] cursor-pointer overflow-hidden transition duration-300 ease-out">
@@ -70,4 +70,4 @@ const AgentModal = ({ action, agent, setShowAgentModal }) => {
     );
 };
 
-export default AgentModal;
+export default UserModal;

@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import Agent from "./pages/Agent";
+import Users from "./pages/Users";
 
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AlreadyAuthenticatedRoute } from "./components/AlreadyAuthenticatedRoute";
@@ -31,10 +32,15 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/agent/:id" element={
-              <>
+              <ProtectedRoute>
                 <Navbar />
                 <Agent />
-              </>} />
+              </ProtectedRoute>} />
+            <Route path="/users" element={
+              <ProtectedRoute>
+                <Navbar />
+                <Users />
+              </ProtectedRoute>} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
