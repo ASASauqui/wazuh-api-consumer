@@ -9,6 +9,8 @@ import Navbar from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AlreadyAuthenticatedRoute } from "./components/AlreadyAuthenticatedRoute";
 import { AuthProvider } from "./hooks/useAuth";
+import Decoders from "./pages/Decoders";
+import Rules from "./pages/Rules";
 
 function App() {
   return (
@@ -27,6 +29,18 @@ function App() {
               <ProtectedRoute>
                 <Navbar />
                 <Home />
+              </ProtectedRoute>
+            } />
+            <Route path="/decoders" element={
+              <ProtectedRoute>
+                <Navbar />
+                <Decoders />
+              </ProtectedRoute>
+            } />
+            <Route path="/rules" element={
+              <ProtectedRoute>
+                <Navbar />
+                <Rules />
               </ProtectedRoute>
             } />
           </Routes>
