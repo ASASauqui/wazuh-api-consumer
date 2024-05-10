@@ -87,7 +87,7 @@ const Rules = () => {
                             {decoder != "" && <input type="button" className="w-1/4 mt-2 p-2 border border-gray-200 rounded-md bg-cyan-950 text-white" value="Copiar" onClick={handleCopyToClipboard} />}
                         </div>
 
-                        <textarea className="w-full mt-2 h-40 p-2 border border-gray-200 rounded-md" disabled value={rule} placeholder="Decoder generado"></textarea>
+                        <textarea className="w-full mt-2 h-40 p-2 border border-gray-200 rounded-md" disabled value={rule} placeholder="Regla generada"></textarea>
 
                     </div>
                     

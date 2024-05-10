@@ -38,7 +38,7 @@ export const getRule = (decoder, ruleId, level, description, variables) => {
     rule += `
     <group name="${programName},">
         <rule id="${ruleId}" level="${level}">
-            <decoded_as>${decoderName}</decoded_as>    
+            <decoded_as>${decoderName}</decoded_as>
             ${
                 Object.keys(cleanVariables).map(variable => (
                     `<field name="${variable}">${variables[variable]}</field>`
