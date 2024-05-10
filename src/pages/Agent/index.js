@@ -5,18 +5,19 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getVulnerabilities, getAgentVulnerabilitiesFieldSummary } from '../../services/vulnerability';
 
+const colors = {
+    'low': 'bg-green-100 text-green-800',
+    'medium': 'bg-yellow-100 text-yellow-800',
+    'high': 'bg-red-100 text-red-800',
+    'critical': 'bg-red-500 text-red-100'
+};
+
 function Agent() {
     const { id } = useParams();
     const { user } = useAuth();
     const [vulnerabilities, setVulnerabilities] = useState([]);
     const [severitySummary, setSeveritySummary] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    const colors = {
-        'low': 'bg-green-100 text-green-800',
-        'medium': 'bg-yellow-100 text-yellow-800',
-        'high': 'bg-red-100 text-red-800'
-    };
 
     useEffect(() => {
         setLoading(true);
@@ -27,6 +28,11 @@ function Agent() {
 
             const summaryResponse = await getAgentVulnerabilitiesFieldSummary(user.token, id, 'severity');
             const summaryData = await summaryResponse.json();
+
+            if (vulnerabilitiesData.data === undefined || summaryData.data === undefined) {
+                setLoading(false);
+                return;
+            }
 
             setVulnerabilities(vulnerabilitiesData.data.affected_items);
             setSeveritySummary(summaryData.data.severity);
@@ -60,7 +66,7 @@ function Agent() {
 
                     {/* Summary */}
                     {!loading && severitySummary && (
-                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-5 gap-5">
                             <div className="flex flex-col justify-center items-center px-5 py-10">
                                 <h1 className="text-2xl font-bold text-gray-800">Low</h1>
                                 <p className="text-3xl font-bold text-green-600">{severitySummary.Low || 0}</p>
@@ -77,6 +83,11 @@ function Agent() {
                             </div>
 
                             <div className="flex flex-col justify-center items-center px-5 py-10">
+                                <h1 className="text-2xl font-bold text-gray-800">Critical</h1>
+                                <p className="text-3xl font-bold text-red-800">{severitySummary.Critical || 0}</p>
+                            </div>
+
+                            <div className="flex flex-col justify-center items-center px-5 py-10">
                                 <h1 className="text-2xl font-bold text-gray-800">Total</h1>
                                 <p className="text-3xl font-bold text-gray-600">{vulnerabilities.length || 0}</p>
                             </div>
@@ -87,7 +98,7 @@ function Agent() {
                     {/* No vulnerabilities */}
                     {!loading && vulnerabilities.length === 0 && (
                         <div className="flex justify-center items-center">
-                            <p className="text-gray-500">No vulnerabilities found</p>
+                            <p className="text-gray-500">No vulnerabilidades encontradas</p>
                         </div>
                     )}
 
@@ -108,7 +119,7 @@ function Agent() {
                                             scope="col"
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Severity
+                                            Severidad
                                         </th>
                                         <th
                                             scope="col"
@@ -120,31 +131,31 @@ function Agent() {
                                             scope="col"
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Title
+                                            Título
                                         </th>
                                         <th
                                             scope="col"
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Version
+                                            Versión
                                         </th>
                                         <th
                                             scope="col"
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Published
+                                            Publicado
                                         </th>
                                         <th
                                             scope="col"
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            Status
+                                            Estado
                                         </th>
                                         <th
                                             scope="col"
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         >
-                                            CVSS3 Score
+                                            Puntuación CVSS3
                                         </th>
                                     </tr>
                                 </thead>

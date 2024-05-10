@@ -28,3 +28,13 @@ export const deleteAgent = async (params, token) => {
         }
     });
 };
+
+export const summarizeAgentsStatus = async (token) => {
+    return await fetch(`${process.env.REACT_APP_API_URL}/agents/summary/status`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    });
+};

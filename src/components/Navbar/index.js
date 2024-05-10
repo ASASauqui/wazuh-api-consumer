@@ -73,6 +73,14 @@ function Navbar() {
                                 >
                                     Usuarios
                                 </a>
+
+                                {/* All Vulnerabilities Link */}
+                                <a
+                                    className="text-black/60 transition duration-200 hover:text-black/80 hover:ease-in-out focus:text-black/80 active:text-black/80 motion-reduce:transition-none lg:px-2"
+                                    href="/all_vulnerabilities"
+                                >
+                                    Vulnerabilidades
+                                </a>
                             </li>
                             <li className="mb-4 lg:mb-0 lg:pe-2">
                                 {/* Home Link */}

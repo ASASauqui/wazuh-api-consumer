@@ -1,6 +1,5 @@
 import './index.css';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from "../../hooks/useAuth";
 import { listUsers, deleteUsers } from '../../services/security';
@@ -8,7 +7,6 @@ import RippleButton from '../../components/Buttons/RippleButton';
 import UserModal from '../../components/Modals/UserModal';
 
 function Users() {
-    const navigate = useNavigate();
     const { user } = useAuth();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -27,17 +25,14 @@ function Users() {
         }
 
         setUsers(data.data.affected_items);
+
+        setLoading(false);
     };
 
     useEffect(() => {
         setLoading(true);
         fetchUsers();
-        setLoading(false);
     }, []);
-
-    const handleUserClick = (id) => {
-        navigate(`/user/${id}`);
-    };
 
     const handleDeleteUser = async (userObject) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
@@ -81,7 +76,7 @@ function Users() {
 
                     {/* Loading */}
                     {loading && (
-                        <div className="flex justify-center items-center">
+                        <div className="flex justify-center items-center py-20">
                             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
                         </div>
                     )}
@@ -95,7 +90,7 @@ function Users() {
 
                     {/* Users */}
                     {!loading && users.length > 0 && (
-                        <div className='max-h-96 overflow-auto'>
+                        <div className='overflow-auto'>
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>

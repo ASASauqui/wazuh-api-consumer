@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from "../../hooks/useAuth";
-import { listAgents, deleteAgent } from '../../services/agents';
+import { listAgents, deleteAgent, summarizeAgentsStatus } from '../../services/agents';
 import RippleButton from '../../components/Buttons/RippleButton';
 import AgentModal from '../../components/Modals/AgentModal';
 
@@ -11,6 +11,8 @@ function Home() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [agents, setAgents] = useState([]);
+    const [agentsSummaryConnection, setAgentsSummaryConnection] = useState(null);
+    const [agentsSummaryConfiguration, setAgentsSummaryConfiguration] = useState(null);
     const [loading, setLoading] = useState(true);
 
     // Agent Actions
@@ -19,14 +21,23 @@ function Home() {
     const [showAgentModal, setShowAgentModal] = useState(false);
 
     const fetchAgents = async () => {
-        const response = await listAgents(user.token);
-        const data = await response.json();
+        const listAgentsResponse = await listAgents(user.token);
+        const listAgentsData = await listAgentsResponse.json();
 
-        if (!response.ok) {
+        const summaryResponse = await summarizeAgentsStatus(user.token);
+        const summaryData = await summaryResponse.json();
+
+        if (!listAgentsResponse.ok || !summaryResponse.ok) {
+            setLoading(false);
             return;
         }
 
-        const filteredAgents = data.data.affected_items.map((agent) => {
+        if (listAgentsData.data === undefined || summaryData.data === undefined) {
+            setLoading(false);
+            return;
+        }
+
+        const filteredAgents = listAgentsData.data.affected_items.map((agent) => {
             var osName = "unknown";
 
             if (agent.os !== undefined && agent.os.name !== undefined) {
@@ -44,12 +55,15 @@ function Home() {
         });
 
         setAgents(filteredAgents);
+        setAgentsSummaryConnection(summaryData.data.connection);
+        setAgentsSummaryConfiguration(summaryData.data.configuration);
+
+        setLoading(false);
     };
 
     useEffect(() => {
         setLoading(true);
         fetchAgents();
-        setLoading(false);
     }, []);
 
     const handleAgentClick = (id) => {
@@ -98,10 +112,68 @@ function Home() {
 
                     {/* Loading */}
                     {loading && (
-                        <div className="flex justify-center items-center">
+                        <div className="flex justify-center items-center py-20">
                             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
                         </div>
                     )}
+
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 my-5'>
+                        {/* Summary connection */}
+                        {!loading && agentsSummaryConnection && (
+                            <div className='flex flex-col border border-gray-200 rounded-md p-5 gap-5'>
+                                <h2 className="text-lg font-bold text-gray-800">Resumen de conexión</h2>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 text-center">
+                                    <div className="flex flex-col justify-center items-center px-5">
+                                        <h2 className="text-sm font-bold text-gray-800">Activo</h2>
+                                        <p className="text-xl font-bold text-green-600">{agentsSummaryConnection.active || 0}</p>
+                                    </div>
+
+                                    <div className="flex flex-col justify-center items-center px-5">
+                                        <h2 className="text-sm font-bold text-gray-800">Desconectado</h2>
+                                        <p className="text-xl font-bold text-red-600">{agentsSummaryConnection.disconnected || 0}</p>
+                                    </div>
+
+                                    <div className="flex flex-col justify-center items-center px-5">
+                                        <h2 className="text-sm font-bold text-gray-800">Nunca conectado</h2>
+                                        <p className="text-xl font-bold text-purple-600">{agentsSummaryConnection.never_connected || 0}</p>
+                                    </div>
+
+                                    <div className="flex flex-col justify-center items-center px-5">
+                                        <h2 className="text-sm font-bold text-gray-800">Pendiente</h2>
+                                        <p className="text-xl font-bold text-blue-600">{agentsSummaryConnection.pending || 0}</p>
+                                    </div>
+
+                                    <div className="flex flex-col justify-center items-center px-5">
+                                        <h2 className="text-sm font-bold text-gray-800">Total</h2>
+                                        <p className="text-xl font-bold text-gray-600">{agentsSummaryConnection.total || 0}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Summary configuration */}
+                        {!loading && agentsSummaryConfiguration && (
+                            <div className='flex flex-col border border-gray-200 rounded-md p-5 gap-5'>
+                                <h2 className="text-lg font-bold text-gray-800">Resumen de configuración</h2>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 text-center">
+                                    <div className="flex flex-col justify-center items-center px-5">
+                                        <h2 className="text-sm font-bold text-gray-800">Sincronizado</h2>
+                                        <p className="text-xl font-bold text-green-600">{agentsSummaryConfiguration.synced || 0}</p>
+                                    </div>
+
+                                    <div className="flex flex-col justify-center items-center px-5">
+                                        <h2 className="text-sm font-bold text-gray-800">No sincronizado</h2>
+                                        <p className="text-xl font-bold text-red-600">{agentsSummaryConfiguration.not_synced || 0}</p>
+                                    </div>
+
+                                    <div className="flex flex-col justify-center items-center px-5">
+                                        <h2 className="text-sm font-bold text-gray-800">Total</h2>
+                                        <p className="text-xl font-bold text-gray-600">{agentsSummaryConfiguration.total || 0}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     {/* No agents */}
                     {!loading && agents.length === 0 && (
@@ -112,7 +184,7 @@ function Home() {
 
                     {/* Agents */}
                     {!loading && agents.length > 0 && (
-                        <div className='max-h-96 overflow-auto'>
+                        <div className='overflow-auto'>
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
@@ -170,10 +242,6 @@ function Home() {
                                                     onClick={(e) => { e.stopPropagation(); handleDeleteAgent(agent) }}>
                                                     Borrar
                                                 </button>
-                                                {/* <button className="text-primary hover:text-primary-900"
-                                                    onClick={(e) => { e.stopPropagation(); console.log('Restart agent') }}>
-                                                    Restart
-                                                </button> */}
                                             </td>
                                         </tr>
                                     ))

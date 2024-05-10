@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import Agent from "./pages/Agent";
 import Users from "./pages/Users";
+import AllVulnerabilities from "./pages/AllVulnerabilities";
 
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AlreadyAuthenticatedRoute } from "./components/AlreadyAuthenticatedRoute";
@@ -54,6 +55,11 @@ function App() {
               <ProtectedRoute>
                 <Navbar />
                 <Users />
+              </ProtectedRoute>} />
+            <Route path="/all_vulnerabilities" element={
+              <ProtectedRoute>
+                <Navbar />
+                <AllVulnerabilities />
               </ProtectedRoute>} />
           </Routes>
         </AuthProvider>
