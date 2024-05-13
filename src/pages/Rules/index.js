@@ -69,7 +69,7 @@ const Rules = () => {
                                     Object.keys(variables).map((variable, index) => (
                                         <div className='flex items-center w-1/2' key={index}>
                                             <span className='w-1/4'>{variable}</span>
-                                            <input type="text" className="w-1/2 mt-2 mx-2 p-2 border border-gray-200 rounded-md" placeholder="Valor" value={variables[variable]} onChange={(e) => setVariable({ ...variables, [variable]: e.target.value })} />
+                                            <input type="text" className="w-1/2 mt-2 mx-2 p-2 border border-gray-200 rounded-md" placeholder="Valor (Opcional)" value={variables[variable]} onChange={(e) => setVariable({ ...variables, [variable]: e.target.value })} />
                                         </div>
                                     ))
                                 }
